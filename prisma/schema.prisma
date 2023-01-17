@@ -1,0 +1,40 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "cargo prisma"
+  output   = "../src/generated/prisma.rs"
+}
+
+model User {
+  Id        Int       @id @default(autoincrement())
+  CreatedAt DateTime  @default(now())
+  Email     String    @unique
+  Password  String
+  Name      String
+  Role      Role      @default(USER)
+  Products  Product[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Product {
+  Id         Int        @id @default(autoincrement())
+  CreatedAt  DateTime   @default(now())
+  Content    String
+  Highlight  Boolean    @default(false)
+  Owner      User?      @relation(fields: [OwnerId], references: [Id])
+  OwnerId    Int?
+  Categories Category[]
+}
+
+model Category {
+  Id       Int       @id @default(autoincrement())
+  Name     String
+  Products Product[]
+}
